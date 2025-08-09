@@ -4,9 +4,13 @@ class Configature::Stamper
   end
 
   def examples
-    map = Dir.glob(File.expand_path('*.example', @dir)).map do |source|
+    map = (
+      Dir.glob(File.expand_path('*.example', @dir)).map do |source|
       [ source, source.delete_suffix('.example') ]
-    end.to_h
+      end + Dir.glob(File.expand_path('*.example.*', @dir)).map do |source|
+        [ source, source.sub(/\.example\./, '.') ]
+      end
+    ).to_h
 
     if (block_given?)
       map.each do |k,v|
@@ -39,7 +43,7 @@ class Configature::Stamper
         ) if (block_given?)
       else
         FileUtils.copy(source, target)
-    
+
         yield(
           source,
           target,
